@@ -81,11 +81,16 @@ private:
 		com mContents;
 		TreeNode* mLeftNode;
 		TreeNode* mRightNode;
+		int mHeight;
 		//空接口考虑com的初始化问题;
-		TreeNode() :mContents(com()),mLeftNode(nullptr), mRightNode(nullptr) {};
+		TreeNode() :mContents(com()),mLeftNode(nullptr), mRightNode(nullptr),mHeight(0) {};
 		//初始化接口;
+		//height=0;
 		TreeNode(const com &pcon, TreeNode* plNode, TreeNode* prNode) :
-			mContents(pcon), mLeftNode(plNode), mRightNode(prNode) {};
+			mContents(pcon), mLeftNode(plNode), mRightNode(prNode),mHeight(0) {};
+		TreeNode(const com &pcon, TreeNode* plNode, TreeNode* prNode, int ph = 0) :
+			mContents(pcon), mLeftNode(plNode), mRightNode(prNode), mHeight(ph) {};
+
 		//mContents的右值引用接口,没写;
 	};
 	TreeNode* mRoot;
