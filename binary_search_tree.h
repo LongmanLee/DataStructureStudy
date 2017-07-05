@@ -34,7 +34,7 @@ public:
 	};
 	~BinSearchTree() { clear(mRoot); };
 	void insert(const com &rcon) { xInsert(rcon, mRoot); findDepth(mRoot,1); };
-	void insert(com &&rcon) { insert(std::move(rcon), mRoot); };
+	void insert(com &&rcon) { xInsert(std::move(rcon), mRoot); };
 	typedef vector<vector<int>> showImg;
 	void printTreeGraph(ostream & out) {
 		if (mRoot == nullptr)
@@ -67,6 +67,9 @@ public:
 	void clearAll() {
 		xclearAll(mRoot); treeMaxDepth = 0; treeMinDepth = MAXINT;
 	};
+	void removeNode(const com &pc) {
+		xremoveNode(pc, mRoot);
+	};
 	//inline
 public:
 	inline int getMaxDepth()const { return treeMaxDepth; };
@@ -88,9 +91,8 @@ private:
 		//height=0;
 		TreeNode(const com &pcon, TreeNode* plNode, TreeNode* prNode) :
 			mContents(pcon), mLeftNode(plNode), mRightNode(prNode),mHeight(0) {};
-		TreeNode(const com &pcon, TreeNode* plNode, TreeNode* prNode, int ph = 0) :
+		TreeNode(const com &pcon, TreeNode* plNode, TreeNode* prNode, int ph) :
 			mContents(pcon), mLeftNode(plNode), mRightNode(prNode), mHeight(ph) {};
-
 		//mContents的右值引用接口,没写;
 	};
 	TreeNode* mRoot;
@@ -130,6 +132,18 @@ private:
 			xInsert(rc, bst->mLeftNode);
 		else if (rc > bst->mContents)//继续迭代，往右端(大端)前进;
 			xInsert(rc, bst->mRightNode);
+		else//其他情形;
+			;
+
+	}
+	void xInsert(com &&rc, TreeNode *& bst)
+	{
+		if (bst == nullptr)//迭代到基准情形，即左枝或者右枝为nullptr时,插入当前元素;
+			bst = new TreeNode(std::move(rc), nullptr, nullptr);
+		else if (rc < bst->mContents)//继续迭代，往左端(小端)前进;
+			xInsert(std::move(rc), bst->mLeftNode);
+		else if (rc > bst->mContents)//继续迭代，往右端(大端)前进;
+			xInsert(std::move(rc), bst->mRightNode);
 		else//其他情形;
 			;
 
@@ -226,7 +240,86 @@ private:
 		}
 		tn = nullptr;
 	};
-};
+	void xremoveNode(const com &pc,TreeNode* &tn) 
+	{
+		//效率不高，右枝最小节点需要查找两次;
+		//考虑如何更高效;
+		if (tn == nullptr)
+			return;
+		if (pc < tn->mContents)
+			xremoveNode(pc, tn->mLeftNode);
+		else if (pc > tn->mContents)
+			xremoveNode(pc, tn->mRightNode);
+		//pc==tn->mContents,找到目标节点
+		else 
+			{
+				//目标节点有俩子节点;
+				if (tn->mLeftNode!=nullptr&&tn->mRightNode != nullptr)
+					{
+						//查找用右枝中最小节点，代替当前要删除的节点;
+					//	tn->mContents = xgetMin(tn->mRightNode)->mContents;
+						//删除右枝中最小节点;
+					//	xremoveNode(tn->mContents, tn->mRightNode);
+						//尝试更高效的方法;
+						tn->mContents=xremoveMin(tn->mRightNode);
+					}
+				//目标节点至多1个之节点时;
+				else
+					{
+						//复制当前节点指针值;
+						TreeNode *oldNode = tn;
+						//改变当前节点指针，令当前指针指向子节点;
+						//当子节点全为空，tn=nullptr;
+						//当存在一个子节点，tn=子节点;
+						tn = (tn->mLeftNode != nullptr) ? tn->mLeftNode : tn->mRightNode;
+						//删除旧的节点;
+						delete oldNode;
+					}
+			}
+	};
+	TreeNode* xgetMin(TreeNode* tn)const 
+	{
+		//迭代方式;
+		if (tn==nullptr)
+			return nullptr;
+		if (tn->mLeftNode==nullptr)
+		{
+			return tn;
+		}
+		return xgetMin(tn->mLeftNode);
+	};
+	TreeNode* xgetMax(TreeNode* tn)const
+	{
+		//循环方式;
+		if (tn == nullptr)
+			return nullptr;
+		while (tn->mRightNode!=nullptr)
+		{
+			tn = tn->mRightNode;
+		}
+		return tn;
+	};
+	com xremoveMin(TreeNode* &tn)
+	{
+		//移除最小节点,只查找一次，应该更高效了;
+		//当左节点为空时,找到最小节点;
+		if (tn->mLeftNode==nullptr)
+		{
+			
+			com tmv = tn->mContents;
+			TreeNode* oldtn = tn;
+			//把最小节点替换为的其右节点;
+			tn = tn->mRightNode;
+			//删除最小节点;
+			delete oldtn;
+			//返回最小节点数据;
+			return tmv;
+
+		}
+		return xremoveMin(tn->mLeftNode);
+
+	};
+};//class end
 
 
 #endif // binary_search_tree_h__

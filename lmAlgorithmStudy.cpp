@@ -27,7 +27,7 @@ int main()
 	int rval=std::rand();
 	//vector<int> idata = { 1,2,3,4,5,22,6,7,8,9,10,11,12,13 };//depth=3
 	//vector<int> idata = { 6,1,0,10,5,7,18,11,21 };//depth=3
-	vector<int> idata = {6,1,0,10,5,7,11};//depth=2
+	vector<int> idata = {6,1,0,10,5,18,12,10,14,20,19,21};//depth=2
 	//vector<int> idata = { 6,1,10,};//depth=1
 	//vector<int> idata = {0};//depth=0
 	BinSearchTree<int> imtree;
@@ -51,7 +51,10 @@ int main()
 	std::cout << "MaxDepth:" << maxdepth << endl;
 	std::cout << "MinDepth:" << mindepth << endl;
 	bool x = imtree.contains(-1);
-	imtreecopy.clearAll();
+	imtree.removeNode(6);
+	imtree.printTreeGraph(std::cout);
+	imtree.insert(6);
+	imtree.printTreeGraph(std::cout);
 #endif
 #if 0
 	double be = clock();
@@ -64,4 +67,3 @@ int main()
 #endif
     return 0;
 };
-
