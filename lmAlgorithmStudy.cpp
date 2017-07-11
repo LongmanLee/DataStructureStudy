@@ -53,7 +53,7 @@ int main()
 	bool x = imtree.contains(-1);
 	imtree.removeNode(6);
 	imtree.printTreeGraph(std::cout);
-	imtree.insert(6);
+	imtree.insert(6);    
 	imtree.printTreeGraph(std::cout);
 #endif
 #if 0

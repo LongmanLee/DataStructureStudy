@@ -94,6 +94,7 @@ private:
 		TreeNode(const com &pcon, TreeNode* plNode, TreeNode* prNode, int ph) :
 			mContents(pcon), mLeftNode(plNode), mRightNode(prNode), mHeight(ph) {};
 		//mContents的右值引用接口,没写;
+		int content2int() { return static_cast<int>(mContents); };
 	};
 	TreeNode* mRoot;
 	int treeMinDepth = MAXINT;
@@ -206,12 +207,12 @@ private:
 			++temit;
 			xPrintTreeGraph(t->mLeftNode,temit);
 			xPrintTreeGraph(t->mRightNode,temit);
-			rpShow->push_back(t->mContents);
+			rpShow->push_back(t->content2int());
 			//*(temit->begin()) = t->mContents;
 		}
 		else
 		{
-			rpShow->push_back(t->mContents);
+			rpShow->push_back(t->content2int());
 		}
 	}
 	bool xcontain(const com &p, TreeNode *&t) const {
