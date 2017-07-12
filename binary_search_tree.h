@@ -33,7 +33,12 @@ public:
 		std::swap(mRoot, rBST.mRoot); return *this;
 	};
 	~BinSearchTree() { clear(mRoot); };
-	void insert(const com &rcon) { xInsert(rcon, mRoot); findDepth(mRoot,1); };
+	void insert(const com &rcon) {
+		xInsert(rcon, mRoot); //插入一个元素;
+		resetDepth(); //重置最大小深度;
+		findDepth(mRoot, 1); //获取最大小深度;
+		xBalance(mRoot);//平衡树;
+	};
 	void insert(com &&rcon) { xInsert(std::move(rcon), mRoot); };
 	typedef vector<vector<int>> showImg;
 	void printTreeGraph(ostream & out) {
@@ -44,7 +49,6 @@ public:
 		int dep = treeMaxDepth;
 		for (int i = 0; i < treeMaxDepth; ++i)
 		{
-
 			showImage.push_back({ 0 });
 			//vector<com> & de = showImage[i];
 			//for (int j = 0; j < 2 * i; ++j)
@@ -52,11 +56,21 @@ public:
 		}
 		showImg::iterator s = showImage.begin();
 		xPrintTreeGraph(mRoot,s);
+		int pNumSpace = int(pow(2.0, dep));
+		int pcurHeight = 0;
+		int pSpaceStep = 0;
 		for (showImg::iterator i = showImage.begin(); i != showImage.end(); ++i)
 		{
-			for (auto j = ++(i->begin()); j != i->end();++j)
+			++pcurHeight;
+			pSpaceStep = int(pNumSpace / pow(2.0, pcurHeight));
+			pSpaceStep = pSpaceStep < 20 ? pSpaceStep : 10;
+			for (auto j = ++(i->begin()); j != i->end(); ++j)
 			{
-				out << *j << " " ;
+				for (int s = 0; s < pSpaceStep; s++)
+				{
+					out << " ";
+				}
+				out << *j;
 			}
 			out << '\n';
 		}
@@ -74,6 +88,7 @@ public:
 public:
 	inline int getMaxDepth()const { return treeMaxDepth; };
 	inline int getMinDepth()const { return treeMinDepth; };
+
 	//inline void setMaxDepth(int p) { treeMaxDepth = p; };
 	//inline void setMinDepth(int p) { treeMinDepth = p; };
 	//static int TreeMaxDepth(BinSearchTree& bst) { findDepth(bst.mRoot, 1); return bst.getMaxDepth(); };
@@ -85,7 +100,7 @@ private:
 		TreeNode* mLeftNode;
 		TreeNode* mRightNode;
 		int mHeight;
-		//空接口考虑com的初始化问题;
+		//空接口考虑com的初始化问题,若为类，会调用空接口构造函数;
 		TreeNode() :mContents(com()),mLeftNode(nullptr), mRightNode(nullptr),mHeight(0) {};
 		//初始化接口;
 		//height=0;
@@ -94,6 +109,7 @@ private:
 		TreeNode(const com &pcon, TreeNode* plNode, TreeNode* prNode, int ph) :
 			mContents(pcon), mLeftNode(plNode), mRightNode(prNode), mHeight(ph) {};
 		//mContents的右值引用接口,没写;
+		//将内容转为int打印;
 		int content2int() { return static_cast<int>(mContents); };
 	};
 	TreeNode* mRoot;
@@ -149,11 +165,16 @@ private:
 			;
 
 	}
+	void resetDepth() {
+		treeMinDepth = MAXINT;
+		treeMaxDepth = 0;
+	};
 	void findDepth(TreeNode* &tn,int d)
 	{
 		if (tn==nullptr)
 		{
 			treeMinDepth = 0;
+			treeMaxDepth = 0;
 			return;
 		}
 		if (tn->mLeftNode == nullptr&&tn->mRightNode == nullptr)
@@ -208,7 +229,6 @@ private:
 			xPrintTreeGraph(t->mLeftNode,temit);
 			xPrintTreeGraph(t->mRightNode,temit);
 			rpShow->push_back(t->content2int());
-			//*(temit->begin()) = t->mContents;
 		}
 		else
 		{
@@ -243,8 +263,7 @@ private:
 	};
 	void xremoveNode(const com &pc,TreeNode* &tn) 
 	{
-		//效率不高，右枝最小节点需要查找两次;
-		//考虑如何更高效;
+
 		if (tn == nullptr)
 			return;
 		if (pc < tn->mContents)
@@ -255,6 +274,8 @@ private:
 		else 
 			{
 				//目标节点有俩子节点;
+				//效率不高，右枝最小节点需要查找两次;
+				//考虑如何更高效;
 				if (tn->mLeftNode!=nullptr&&tn->mRightNode != nullptr)
 					{
 						//查找用右枝中最小节点，代替当前要删除的节点;
@@ -262,7 +283,7 @@ private:
 						//删除右枝中最小节点;
 					//	xremoveNode(tn->mContents, tn->mRightNode);
 						//尝试更高效的方法;
-						tn->mContents=xremoveMin(tn->mRightNode);
+						tn->mContents = xremoveMin(tn->mRightNode);
 					}
 				//目标节点至多1个之节点时;
 				else
@@ -304,6 +325,8 @@ private:
 	{
 		//移除最小节点,只查找一次，应该更高效了;
 		//当左节点为空时,找到最小节点;
+		//关键策略:用右枝中最小节点代替当前节点,因为最小节点不存在左枝;
+		//容易使用非左右枝删除策略删除;
 		if (tn->mLeftNode==nullptr)
 		{
 			
@@ -320,6 +343,43 @@ private:
 		return xremoveMin(tn->mLeftNode);
 
 	};
+	static const int MaxDepthDiff = 1;
+	inline int getHeight(TreeNode* &tn) const { return tn == nullptr ? -1 : tn->mHeight; };
+	void xBalance(TreeNode* &tn)
+	{
+		if (tn==nullptr)
+			return;
+		//左枝过深;
+		TreeNode* temTn = nullptr;
+		if (getHeight(tn->mLeftNode)-getHeight(tn->mRightNode)>MaxDepthDiff)
+		{
+			temTn = tn->mLeftNode;
+			//左枝的左枝深度>=左枝的右枝深度;
+			if (getHeight(temTn->mLeftNode) >= getHeight(temTn->mRightNode))
+				//单旋转;
+				int x= 0;
+			else
+				//双旋转;
+				int x= 1;
+
+		}
+		//右枝过深;
+		else if (getHeight(tn->mRightNode) - getHeight(tn->mLeftNode)>MaxDepthDiff)
+		{
+			temTn = tn->mRightNode;
+			//右枝的左枝深度>=左枝的右枝深度;
+			if (getHeight(temTn->mLeftNode) >= getHeight(temTn->mRightNode))
+				//单旋转;
+				int x= 0;
+			else
+				//双旋转;
+				int x= 1;
+
+		}
+
+		tn->mHeight = std::max(getHeight(tn->mLeftNode), getHeight(tn->mRightNode)) + 1;
+	};
+
 };//class end
 
 
