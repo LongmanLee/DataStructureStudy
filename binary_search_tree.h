@@ -37,7 +37,6 @@ public:
 		xInsert(rcon, mRoot); //插入一个元素;
 		resetDepth(); //重置最大小深度;
 		findDepth(mRoot, 1); //获取最大小深度;
-		xBalance(mRoot);//平衡树;
 	};
 	void insert(com &&rcon) { xInsert(std::move(rcon), mRoot); };
 	typedef vector<vector<int>> showImg;
@@ -151,7 +150,7 @@ private:
 			xInsert(rc, bst->mRightNode);
 		else//其他情形;
 			;
-
+		xBalance(bst);//平衡树;
 	}
 	void xInsert(com &&rc, TreeNode *& bst)
 	{
@@ -163,6 +162,7 @@ private:
 			xInsert(std::move(rc), bst->mRightNode);
 		else//其他情形;
 			;
+		xBalance(bst);//平衡树;
 
 	}
 	void resetDepth() {
@@ -376,7 +376,8 @@ private:
 				int x= 1;
 
 		}
-
+		//高度更新;
+		//
 		tn->mHeight = std::max(getHeight(tn->mLeftNode), getHeight(tn->mRightNode)) + 1;
 	};
 
