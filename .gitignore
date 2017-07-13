@@ -78,3 +78,6 @@ $RECYCLE.BIN/
 # visual studio 2015 com
 /Debug
 /Release
+/.Archive
+.md_configs.data
+.me_configs.data
