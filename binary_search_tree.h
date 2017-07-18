@@ -87,7 +87,6 @@ public:
 public:
 	inline int getMaxDepth()const { return treeMaxDepth; };
 	inline int getMinDepth()const { return treeMinDepth; };
-
 	//inline void setMaxDepth(int p) { treeMaxDepth = p; };
 	//inline void setMinDepth(int p) { treeMinDepth = p; };
 	//static int TreeMaxDepth(BinSearchTree& bst) { findDepth(bst.mRoot, 1); return bst.getMaxDepth(); };
@@ -166,11 +165,14 @@ private:
 
 	}
 	void resetDepth() {
+		//每次调用重新查找最大小深度时重置;
 		treeMinDepth = MAXINT;
 		treeMaxDepth = 0;
 	};
 	void findDepth(TreeNode* &tn,int d)
 	{
+		//自己写的查找最大值小深度函数;
+		//感觉效率有点低，考虑结合节点高度;
 		if (tn==nullptr)
 		{
 			treeMinDepth = 0;
@@ -354,10 +356,11 @@ private:
 		if (getHeight(tn->mLeftNode)-getHeight(tn->mRightNode)>MaxDepthDiff)
 		{
 			temTn = tn->mLeftNode;
-			//左枝的左枝深度>=左枝的右枝深度;
+			//左枝的左枝深度>=左枝的右枝深度:左外侧;
 			if (getHeight(temTn->mLeftNode) >= getHeight(temTn->mRightNode))
 				//单旋转;
-				int x= 0;
+				xSingleRotate(tn);
+				//int x = 1;
 			else
 				//双旋转;
 				int x= 1;
@@ -368,19 +371,47 @@ private:
 		{
 			temTn = tn->mRightNode;
 			//右枝的左枝深度>=左枝的右枝深度;
-			if (getHeight(temTn->mLeftNode) >= getHeight(temTn->mRightNode))
+			if (getHeight(temTn->mRightNode) >= getHeight(temTn->mLeftNode))
 				//单旋转;
-				int x= 0;
+				xSingleRotate(tn, false);
+				/*int x = 1;*/
 			else
 				//双旋转;
 				int x= 1;
 
 		}
 		//高度更新;
-		//
+		//关键在于，当前节点的左右节点都为空时，getHeight函数都返回-1，从而使mHeight=0;
+		//当往上回退时，便开始自增;
 		tn->mHeight = std::max(getHeight(tn->mLeftNode), getHeight(tn->mRightNode)) + 1;
 	};
+	
+	//单旋转,传入不平衡节点;
+	void xSingleRotate(TreeNode* &k2, bool leftleft=true) {
+		if (leftleft)
+		//左外侧;
+		//策略：;
 
+		{
+			TreeNode *k1 = k2->mLeftNode;
+			k2->mLeftNode = k1->mRightNode;
+			k1->mRightNode = k2;
+			k2->mHeight = max(getHeight(k2->mLeftNode), getHeight(k2->mRightNode)) + 1;
+			k1->mHeight = max(getHeight(k1->mLeftNode), k2->mHeight) + 1;
+			k2 = k1;
+			int x = 0;
+		}
+		else//yo外侧;
+		{
+			TreeNode *k1 = k2->mRightNode;
+			k2->mRightNode = k1->mLeftNode;
+			k1->mLeftNode = k2;
+			k2->mHeight = max(getHeight(k2->mLeftNode), getHeight(k2->mRightNode)) + 1;
+			k1->mHeight = max(getHeight(k1->mRightNode), k2->mHeight) + 1;
+			k2 = k1;
+
+		}
+	};
 };//class end
 
 

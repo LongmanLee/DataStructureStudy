@@ -31,6 +31,7 @@ int main()
 	//vector<int> idata = { 6,1,10};//depth=1
 	//vector<int> idata = { 6,1 ,8,9};//depth=1
 	//vector<int> idata = {0};//depth=0
+	//vector<int> idata = { 2,1,3,4,5 };
 	BinSearchTree<int> imtree;
 // 	for (auto i = 0; i < 20; ++i)
 // 	{
