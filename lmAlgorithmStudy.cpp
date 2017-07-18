@@ -26,12 +26,12 @@ int main()
 	lmdata ldata;
 	int rval=std::rand();
 	//vector<int> idata = { 1,2,3,4,5,22,6,7,8,9,10,11,12,13 };//depth=3
-	vector<int> idata = { 6,1,0,10,5,7,18,11,21 };//depth=3
-	//vector<int> idata = {6,1,0,10,5,18,12,10,14,20,19,21};//depth=2
+	//vector<int> idata = { 6,1,0,10,5,7,18,11,21 };//depth=3
+	vector<int> idata = {6,1,0,10,5,18,12,10,14,20,19,21};//depth=2
 	//vector<int> idata = { 6,1,10};//depth=1
 	//vector<int> idata = { 6,1 ,8,9};//depth=1
 	//vector<int> idata = {0};//depth=0
-	//vector<int> idata = { 2,1,3,4,5 };
+	//vector<int> idata = { 0,1,2,-1,4,5,6,3 };
 	BinSearchTree<int> imtree;
 // 	for (auto i = 0; i < 20; ++i)
 // 	{

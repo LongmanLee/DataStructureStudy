@@ -363,7 +363,7 @@ private:
 				//int x = 1;
 			else
 				//双旋转;
-				int x= 1;
+				xDoubleRotate(tn);
 
 		}
 		//右枝过深;
@@ -374,10 +374,10 @@ private:
 			if (getHeight(temTn->mRightNode) >= getHeight(temTn->mLeftNode))
 				//单旋转;
 				xSingleRotate(tn, false);
-				/*int x = 1;*/
+			/*int x = 1;*/
 			else
 				//双旋转;
-				int x= 1;
+				xDoubleRotate(tn, false);
 
 		}
 		//高度更新;
@@ -410,6 +410,20 @@ private:
 			k1->mHeight = max(getHeight(k1->mRightNode), k2->mHeight) + 1;
 			k2 = k1;
 
+		}
+	};
+
+	void xDoubleRotate(TreeNode* &k3, bool leftright = true) 
+	{
+		if (leftright)
+		{
+			xSingleRotate(k3->mLeftNode, false);
+			xSingleRotate(k3);
+		}
+		else
+		{
+			xSingleRotate(k3->mRightNode);
+			xSingleRotate(k3,false);
 		}
 	};
 };//class end
